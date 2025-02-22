@@ -19,20 +19,18 @@ fn main() {
 
     sleep(Duration::from_millis(80));
 
-    let mut received: [u8; 7] = [0xff; 7];
-    let len_received = i2c.read(&mut received).expect("Unable to receive data");
-    if len_received == 7 && received[0] % 2 == 0 {
+    let mut data: [u8; 7] = [0xff; 7];
+    let len_received = i2c.read(&mut data).expect("Unable to receive data");
+    if len_received == 7 && data[0] % 2 == 0 {
         println!("Measurement finished!");
 
-        let s_rh = (received[1] as u32) * pow2(8 + 4)
-            + (received[2] as u32) * pow2(4)
-            + ((received[3] >> 4) as u32);
+        let s_rh =
+            (data[1] as u32) * pow2(8 + 4) + (data[2] as u32) * pow2(4) + ((data[3] >> 4) as u32);
         let rh = (s_rh as f32) / (pow2(20) as f32) * 100.0;
         println!("RH (%): {}", rh);
 
-        let s_t = ((received[3] & 0x0f) as u32) * pow2(8 + 8)
-            + (received[4] as u32) * pow2(8)
-            + (received[5] as u32);
+        let s_t =
+            ((data[3] & 0x0f) as u32) * pow2(8 + 8) + (data[4] as u32) * pow2(8) + (data[5] as u32);
         let t = (s_t as f32) / (pow2(20) as f32) * 200.0 - 50.0;
         println!("T (℃): {}", t);
     } else {
