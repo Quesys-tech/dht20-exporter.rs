@@ -1,3 +1,6 @@
+use metrics::{describe_gauge, gauge};
+use metrics_exporter_prometheus::PrometheusBuilder;
+use metrics_util::MetricKindMask;
 use rppal::i2c::I2c;
 use rppal::system::DeviceInfo;
 use std::{thread::sleep, time::Duration};
@@ -69,6 +72,15 @@ fn get_dht20_data(i2c: &mut I2c) -> Result<DHT20Data, DHT20Error> {
 fn main() {
     println!("Running on a {}.", DeviceInfo::new().unwrap().model());
 
+    let builder = PrometheusBuilder::new().with_http_listener(([0, 0, 0, 0], 9000));
+    builder
+        .idle_timeout(MetricKindMask::COUNTER, Some(Duration::from_secs(30)))
+        .install()
+        .expect("failed to install Prometheus recorder");
+
+    describe_gauge!("room_temperature", "Room temperature");
+    describe_gauge!("room_relative_humidity", "Room relative humidity");
+
     let mut i2c = I2c::with_bus(1).expect("Unable to construct I2c");
     loop {
         match get_dht20_data(&mut i2c) {
@@ -77,6 +89,8 @@ fn main() {
                     "Temperature: {:.1}°C, Humidity: {:.1}%",
                     data.temperature, data.humidity
                 );
+                gauge!("room_temperature").set(data.temperature);
+                gauge!("room_relative_humidity").set(data.humidity);
             }
             Err(e) => {
                 println!("Error: {:?}", e);
