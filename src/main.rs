@@ -85,10 +85,6 @@ fn main() {
     loop {
         match get_dht20_data(&mut i2c) {
             Ok(data) => {
-                println!(
-                    "Temperature: {:.1}°C, Humidity: {:.1}%",
-                    data.temperature, data.humidity
-                );
                 gauge!("room_temperature").set(data.temperature);
                 gauge!("room_relative_humidity").set(data.humidity);
             }
