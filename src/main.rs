@@ -74,7 +74,7 @@ fn main() {
 
     let builder = PrometheusBuilder::new().with_http_listener(([0, 0, 0, 0], 9000));
     builder
-        .idle_timeout(MetricKindMask::COUNTER, Some(Duration::from_secs(30)))
+        .idle_timeout(MetricKindMask::COUNTER, Some(Duration::from_secs(300)))
         .install()
         .expect("failed to install Prometheus recorder");
 
@@ -96,6 +96,6 @@ fn main() {
                 println!("Error: {:?}", e);
             }
         }
-        sleep(Duration::from_millis(900));
+        sleep(Duration::from_secs(10));
     }
 }
