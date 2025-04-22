@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-metrics-exporter-prometheus = "0.16.2"
+metrics-exporter-prometheus = "0.17.0"
 
 rppal = { version = "0.22.1", features = ["hal"] }
